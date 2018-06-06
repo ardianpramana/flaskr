@@ -22,6 +22,7 @@
         {% if g.user['id'] == post['author_id'] %}
           <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
         {% endif %}
+        <!--<label style="background-color:red;color:white;padding:5px;">{{ post['count(lk.is_like)'] }}</label>-->
       </header>
       <p class="body">{{ post['body'] }}</p>
     </article>

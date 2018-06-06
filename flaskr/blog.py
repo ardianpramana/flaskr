@@ -17,6 +17,14 @@ def index():
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
+
+    # posts = db.execute(
+    #     'SELECT po.id, po.created, po.title, po.body, count(lk.is_like)'
+    #     'FROM ('
+    #     'SELECT p.id, title, body, created FROM post p JOIN user u ON p.author_id = u.id ORDER BY created DESC'
+    #     ') po JOIN likes lk ON po.id = lk.post_id WHERE lk.is_like = 1 GROUP BY lk.post_id'
+    # ).fetchall()
+
     return render_template('blog/index.html', posts=posts)
 
 
