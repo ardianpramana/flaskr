@@ -18,10 +18,10 @@
         </div>
         {% if g.user['id'] %}
           <a class="action" href="{{ url_for('blog.like_this_post', post_id=post['id']) }}">
-            {% if not is_like %} Up! {% else %} Down! {% endif %}
+            {% if not is_like %} Like! {% else %} Unlike! {% endif %}
           </a>
         {% endif %}
-          <label style="background-color:red;color:white;padding:5px;">{{ likes_count }}</label>
+          <label style="background-color:red;color:white;padding:5px;">{{ likes_count }} likes</label>
         {% if g.user['id'] == post['author_id'] %}
           <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
         {% endif %}

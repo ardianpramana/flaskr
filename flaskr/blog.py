@@ -12,18 +12,20 @@ bp = Blueprint('blog', __name__)
 @bp.route('/')
 def index():
     db = get_db()
+    # posts = db.execute(
+    #     'SELECT p.id, title, body, created, author_id, username'
+    #     ' FROM post p JOIN user u ON p.author_id = u.id'
+    #     ' ORDER BY created DESC'
+    # ).fetchall()
+
+    """ Counting likes total. """
     posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' ORDER BY created DESC'
+        'SELECT po.id id, po.created created, po.title title, po.body body, sum(lk.is_like) sum_like FROM ('
+	        'SELECT p.id, title, body, created FROM post p JOIN "user" u ON p.author_id = u.id'
+        ') po LEFT JOIN likes lk ON po.id = lk.post_id GROUP BY lk.post_id ORDER BY created DESC'
     ).fetchall()
 
-    # posts = db.execute(
-    #     'SELECT po.id, po.created, po.title, po.body, count(lk.is_like)'
-    #     'FROM ('
-    #     'SELECT p.id, title, body, created FROM post p JOIN user u ON p.author_id = u.id ORDER BY created DESC'
-    #     ') po JOIN likes lk ON po.id = lk.post_id WHERE lk.is_like = 1 GROUP BY lk.post_id'
-    # ).fetchall()
+    print(len(posts))
 
     return render_template('blog/index.html', posts=posts)
 
@@ -98,7 +100,6 @@ def post_detail(id):
     is_like = False
 
     if g.user:
-        print('g has user, running like_detail')
         like_detail = get_likes_detail(post['id'], g.user['id'])
         if like_detail:
             is_like = like_detail['is_like']
