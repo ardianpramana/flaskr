@@ -94,21 +94,57 @@ def delete(id):
     return redirect(url_for('blog.index'))
 
 
-@bp.route('/<int:id>/post')
+@bp.route('/<int:id>/post', methods=('GET', 'POST'))
 def post_detail(id):
     post = get_post_detail(id)
-    is_like = False
+    db = get_db()
 
+    if request.method == 'POST':
+        visitor = request.form['name']
+        comment = request.form['comment']
+        error = None
+        if not visitor:
+            error = 'Your name is required.'
+        if not comment:
+            error = 'Comment is required.'
+        if error is not None:
+            flash(error)
+
+        db.execute(
+            'INSERT INTO comments (post_id, visitor, comment)'
+            ' VALUES (?, ?, ?)',
+            (id, visitor, comment)
+        )
+        db.commit()
+
+    is_like = False
     if g.user:
         like_detail = get_likes_detail(post['id'], g.user['id'])
         if like_detail:
             is_like = like_detail['is_like']
         else:
             is_like = False
-
     likes_count = get_likes_count(id)
 
-    return render_template('blog/post_detail.html', post=post, is_like=is_like, likes_count=likes_count)
+    """ Get comment if exists """
+    comments = db.execute(
+        'SELECT id, created, post_id, visitor, comment'
+        ' FROM comments WHERE post_id = ?', (id,)
+    ).fetchall()
+
+    comment_count = 0
+    if comments:
+        comment_count = len(comments)
+
+    data = {
+        'likes_count': likes_count,
+        'is_like': is_like,
+        'post': post,
+        'comments': comments,
+        'comment_count': comment_count,
+    }
+
+    return render_template('blog/post_detail.html', data=data)
 
 
 @bp.route('/<int:post_id>/like')

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <!--<h1>{% block title %}{{ post['title'] }}{% endblock %}</h1>-->
+  <!--<h1>{% block title %}{{ data.post['title'] }}{% endblock %}</h1>-->
     <br/>
 {% endblock %}
 
@@ -10,22 +10,45 @@
       <header>
         <div>
           <h1>
-              <a href="{{ url_for('blog.post_detail', id=post['id']) }}">
-                {{ post['title'] }}
+              <a href="{{ url_for('blog.post_detail', id=data.post['id']) }}">
+                {{ data.post['title'] }}
               </a>
           </h1>
-          <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d') }}</div>
+          <div class="about">by {{ data.post['username'] }} on {{ data.post['created'].strftime('%Y-%m-%d') }}</div>
         </div>
         {% if g.user['id'] %}
-          <a class="action" href="{{ url_for('blog.like_this_post', post_id=post['id']) }}">
-            {% if not is_like %} Like! {% else %} Unlike! {% endif %}
+          <a class="action" href="{{ url_for('blog.like_this_post', post_id=data.post['id']) }}">
+            {% if not data.is_like %} Like! {% else %} Unlike! {% endif %}
           </a>
         {% endif %}
-          <label style="background-color:red;color:white;padding:5px;">{{ likes_count }} likes</label>
-        {% if g.user['id'] == post['author_id'] %}
-          <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
+          <label style="background-color:red;color:white;padding:5px;">{{ data.likes_count }} likes</label>
+        {% if g.user['id'] == data.post['author_id'] %}
+          <a class="action" href="{{ url_for('blog.update', id=data.post['id']) }}">Edit</a>
         {% endif %}
       </header>
-      <p class="body">{{ post['body'] }}</p>
+      <p class="body">{{ data.post['body'] }}</p>
     </article>
+    <section>
+        <hr/>
+        <h3>{{ data.comment_count }} Comments</h3>
+        <div class="comment" style="padding:20px;background-color:#f7f7f7;">
+            {% for comment in data.comments %}
+            <div class="comment-item" style="margin-bottom:30px;">
+                <p><i><b>{{ comment.visitor }}</b></i> on {{ comment.created.strftime('%Y-%m-%d') }}</p>
+                <p>{{ comment.comment }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    <section>
+        <hr/>
+        <form method="post">
+            <label for="name">Name</label>
+            <input name="name" id="name" value="" required>
+            <label for="comment">Comment</label>
+            <textarea name="comment" id="comment" required></textarea>
+            <input type="submit" value="Send">
+        </form>
+    </section>
+
 {% endblock %}
