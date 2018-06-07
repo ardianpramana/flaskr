@@ -1,11 +1,17 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <!--<h1>{% block title %}{{ data.post['title'] }}{% endblock %}</h1>-->
+  <h4>
+      {% block title %}
+        <a href="{{ url_for('blog.index') }}">Home</a> &gt;
+        {{ data.post['title'] }}
+      {% endblock %}
+  </h4>
     <br/>
 {% endblock %}
 
 {% block content %}
+    <!-- Article Section -->
     <article class="post">
       <header>
         <div>
@@ -28,6 +34,7 @@
       </header>
       <p class="body">{{ data.post['body'] }}</p>
     </article>
+    <!-- Comment Section -->
     <section>
         <hr/>
         <h3>{{ data.comment_count }} Comments</h3>
@@ -40,6 +47,7 @@
             {% endfor %}
         </div>
     </section>
+    <!-- Comment form Section -->
     <section>
         <hr/>
         <form method="post">

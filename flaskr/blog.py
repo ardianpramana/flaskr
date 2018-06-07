@@ -12,22 +12,35 @@ bp = Blueprint('blog', __name__)
 @bp.route('/')
 def index():
     db = get_db()
-    # posts = db.execute(
-    #     'SELECT p.id, title, body, created, author_id, username'
-    #     ' FROM post p JOIN user u ON p.author_id = u.id'
-    #     ' ORDER BY created DESC'
-    # ).fetchall()
-
-    """ Counting likes total. """
     posts = db.execute(
-        'SELECT po.id id, po.created created, po.title title, po.body body, sum(lk.is_like) sum_like FROM ('
-	        'SELECT p.id, title, body, created FROM post p JOIN "user" u ON p.author_id = u.id'
-        ') po LEFT JOIN likes lk ON po.id = lk.post_id GROUP BY lk.post_id ORDER BY created DESC'
+        'SELECT p.id, title, body, created, author_id, username'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' ORDER BY created DESC'
     ).fetchall()
 
-    print(len(posts))
+    """ Get likes total """
+    likes_list = []
+    comments_list = []
+    for post in posts:
+        likes = db.execute(
+            'SELECT id, post_id, is_like FROM likes WHERE post_id=? and is_like=1', (post['id'],)
+        ).fetchall()
+        likes_list.append(len(likes))
 
-    return render_template('blog/index.html', posts=posts)
+        comments = db.execute(
+            'SELECT id FROM comments WHERE post_id=?', (post['id'],)
+        ).fetchall()
+        comments_list.append(len(comments))
+
+    data = {
+        'posts': posts,
+        'likes_list': likes_list,
+        'comments_list': comments_list,
+    }
+
+    print(data['comments_list'])
+
+    return render_template('blog/index.html', posts=posts, data=data)
 
 
 @bp.route('/create', methods=('GET', 'POST'))
