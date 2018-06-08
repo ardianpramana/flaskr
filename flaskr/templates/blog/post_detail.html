@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    {{ data.post['title'] }}
+{% endblock %}
+
 {% block header %}
-  <h4>
-      {% block title %}
-        <a href="{{ url_for('blog.index') }}">Home</a> &gt;
-        {{ data.post['title'] }}
-      {% endblock %}
-  </h4>
-    <br/>
+  <ul class="breadcrumb">
+      <li><a href="{{ url_for('blog.index') }}">Home</a></li>
+      <li>{{ data.post['title'][0:30] }}..</li>
+  </ul>
 {% endblock %}
 
 {% block content %}
